@@ -3,6 +3,7 @@ import pandas as pd
 import pickle
 import os
 import requests
+import pickle
 
 st.set_page_config(page_title="CubeNSquare IPL Predictor", layout="centered")
 st.title("🏏 CubeNSquare IPL Score Predictor")
@@ -17,25 +18,32 @@ st.caption("Now featuring player-level insights — powered by Data Science inte
 #     st.error(f"Model could not be loaded: {e}")
 #     st.stop()
 
-
-
 MODEL_URL = "https://drive.google.com/uc?export=download&id=14c_fAFqU5f9rCT5k5lgGuQL3PKQpTlWi"
 MODEL_PATH = "models/model.pkl"
 
-# Download the model if it doesn't already exist
+# Make sure models directory exists
+os.makedirs("models", exist_ok=True)
+
+# Download model if it doesn’t exist
 if not os.path.exists(MODEL_PATH):
-    os.makedirs("models", exist_ok=True)
-    with requests.get(MODEL_URL, stream=True) as r:
-        with open(MODEL_PATH, 'wb') as f:
-            for chunk in r.iter_content(chunk_size=8192):
-                if chunk:
+    try:
+        with requests.get(MODEL_URL, stream=True) as r:
+            r.raise_for_status()
+            with open(MODEL_PATH, 'wb') as f:
+                for chunk in r.iter_content(chunk_size=8192):
                     f.write(chunk)
+    except Exception as e:
+        st.error(f"⚠️ Failed to download model: {e}")
+        st.stop()
 
-# Load the model
-with open(MODEL_PATH, 'rb') as f:
-    model = pickle.load(f)
-
-model_features = model.feature_names_in_
+# Try loading the model
+try:
+    with open(MODEL_PATH, 'rb') as f:
+        model = pickle.load(f)
+    model_features = model.feature_names_in_
+except Exception as e:
+    st.error(f"❌ Model could not be loaded: {e}")
+    st.stop()
 
 # Extract available options dynamically from model features
 def extract_options(prefix):
