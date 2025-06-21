@@ -2,31 +2,46 @@ import pandas as pd
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import train_test_split
 import pickle
+import os
 
-# Load the data
+# --- Load Data ---
 df = pd.read_csv('data/ipl_data.csv')
 
-# Drop or convert columns
+# --- Clean & Prepare ---
 df['date'] = pd.to_datetime(df['date']).map(pd.Timestamp.toordinal)
-columns_to_drop = ['batsman', 'bowler', 'non_striker', 'striker']
-df.drop(columns=[col for col in columns_to_drop if col in df.columns], inplace=True)
+df.drop(columns=['mid'], inplace=True)
 
-# One-hot encode categorical columns
-df = pd.get_dummies(df, columns=['bat_team', 'bowl_team', 'venue'])
+# Optional: Sample a portion for faster experimentation (remove this line in production)
+# df = df.sample(frac=0.3, random_state=42)
 
-# Define features and target
+# --- One-Hot Encode ---
+df = pd.get_dummies(df, columns=[
+    'bat_team', 'bowl_team', 'venue',
+    'batsman', 'bowler', 'striker', 'non-striker'
+])
+
+# --- Features & Target ---
 X = df.drop('total', axis=1)
 y = df['total']
 
-# Train/test split
+# --- Train/Test Split ---
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-# Train the model
-model = RandomForestRegressor(n_estimators=100, random_state=42)
+# --- Train Model (Optimized) ---
+model = RandomForestRegressor(
+    n_estimators=50,          # reduced for speed
+    max_depth=20,             # limits tree depth
+    max_features='sqrt',      # faster split finding
+    random_state=42,
+    n_jobs=-1                 # use all CPU cores
+)
+
+print("⏳ Training the model... (this might take a moment)")
 model.fit(X_train, y_train)
 
-# Save the model
+# --- Save Model ---
+os.makedirs('models', exist_ok=True)
 with open('models/model.pkl', 'wb') as f:
     pickle.dump(model, f)
 
-print("✅ Model trained and saved successfully!")
+print("✅ Model trained and saved to models/model.pkl")

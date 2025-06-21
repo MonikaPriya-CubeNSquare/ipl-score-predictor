@@ -8,7 +8,7 @@ if defined _OLD_CODEPAGE (
     "%SystemRoot%\System32\chcp.com" 65001 > nul
 )
 
-set VIRTUAL_ENV=D:\DS-Internship\CubeNSquare_IPL_Score_Predictor\venv
+set VIRTUAL_ENV=D:\DS-Internship\Github\ipl-score-predictor\venv
 
 if not defined PROMPT set PROMPT=$P$G
 

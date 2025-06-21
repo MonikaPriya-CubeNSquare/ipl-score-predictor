@@ -38,7 +38,7 @@ deactivate () {
 # unset irrelevant variables
 deactivate nondestructive
 
-VIRTUAL_ENV="D:\DS-Internship\CubeNSquare_IPL_Score_Predictor\venv"
+VIRTUAL_ENV="D:\DS-Internship\Github\ipl-score-predictor\venv"
 export VIRTUAL_ENV
 
 _OLD_VIRTUAL_PATH="$PATH"
