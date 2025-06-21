@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import pickle
 import os
-import requests
+import gdown
 import pickle
 
 st.set_page_config(page_title="CubeNSquare IPL Predictor", layout="centered")
